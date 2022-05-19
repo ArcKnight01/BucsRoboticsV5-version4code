@@ -13,6 +13,7 @@ extern motor IntakeMotor;
 extern motor_group ArmMotors;
 extern motor ClawMotor;
 extern motor WristMotor;
+extern inertial Inertial;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.

@@ -1,33 +1,36 @@
+
 #include "arms.h"
+
+#include "vex.h"
+using namespace vex;
 
 Arms::Arms(){
   armSpeed = 80;
 }
 
-Arms::Arms(motor_group _armMotors, double _armSpeed){
-  armMotors = _armMotors;
+Arms::Arms(double _armSpeed){
   armSpeed = _armSpeed;
 }
 
 
 void Arms::raise(){
-  armMotors.spin(directionType::fwd, armSpeed, velocityUnits::rpm);
+  ArmMotors.spin(directionType::fwd, armSpeed, velocityUnits::rpm);
 }
 
 void Arms::raise(double speed){
-  armMotors.spin(directionType::fwd, speed, velocityUnits::rpm);
+  ArmMotors.spin(directionType::fwd, speed, velocityUnits::rpm);
 }
 
 void Arms::lower(double speed){
-  armMotors.spin(directionType::fwd, speed, velocityUnits::rpm);
+  ArmMotors.spin(directionType::fwd, speed, velocityUnits::rpm);
 }
 
 void Arms::lower(){
-  armMotors.spin(directionType::fwd, armSpeed, velocityUnits::rpm);
+  ArmMotors.spin(directionType::fwd, armSpeed, velocityUnits::rpm);
 }
 
 void Arms::stop(){
-  armMotors.stop(brakeType::hold);
+  ArmMotors.stop(brakeType::hold);
 }
 
 void Arms::rotateDegree(double rotationAmount, double speed){

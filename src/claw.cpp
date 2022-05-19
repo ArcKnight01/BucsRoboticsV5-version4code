@@ -1,68 +1,63 @@
 #include "claw.h"
+#include "vex.h"
+using namespace vex;
 
 Claw::Claw(){
   initialize();
 }
 
-Claw::Claw(motor _clawMotor){
-  clawMotor = _clawMotor;
-  initialize();
-  
-}
-
 void Claw::initialize(){
-  if(clawMotor.installed()){
-    installed = true;
-  }
-  if(installed){
-    clawMotor.resetPosition();
-    clawMotor.resetRotation();
-    clawMotor.setVelocity(100, percent);
-    clawMotor.setTimeout(5, timeUnits::sec);
-    clawMotor.setBrake(brakeType::hold);
-  }
   
+    ClawMotor.resetPosition();
+    ClawMotor.resetRotation();
+    ClawMotor.setVelocity(100, percent);
+    ClawMotor.setTimeout(5, timeUnits::sec);
+    ClawMotor.setBrake(brakeType::hold);
 
 }
-void Claw::unclamp(){
-    double rotationDegrees = 360;
-    if (clawState == opened) {
-      //claw is opened already
-    } else if (clawState == closed) {
-      //claw is currently closed
-      if(installed){
-        clawMotor.setTimeout(3000, timeUnits::msec);
-        clawMotor.spinFor(directionType::rev, rotationDegrees, degrees); 
-        clawMotor.setBrake(brakeType::hold);
-      }
-     }
-}
-
-void Claw::clamp(){
-  double rotationDegrees = 360;
-  if(clawState == opened){
-    //claw is opem
-  }
-  else if(clawState == closed){
-    if(installed){
-      clawMotor.setTimeout(3000, timeUnits::msec);
-      clawMotor.spinFor(directionType::rev, rotationDegrees, degrees); 
-      clawMotor.setBrake(brakeType::hold);
+void Claw::unclamp(double rotationDegrees){
+    rotationDegrees *= gearRatio;
+    if (clawState != opened && clawState == closed) {
+        wait(5,msec);
+        ClawMotor.setTimeout(5, seconds);
+        ClawMotor.spinFor(directionType::rev, rotationDegrees, rotationUnits::deg); 
+        ClawMotor.setBrake(brakeType::hold);
     }
+    else if (clawState == opened){
+      Controller1.rumble("..");
+    }
+    clawState = opened;
+}
+
+void Claw::clamp(double rotationDegrees){
+  rotationDegrees *= gearRatio;
+  if(clawState!=closed && clawState == opened){
+    wait(5, msec);
+    ClawMotor.setTimeout(5, seconds);
+    ClawMotor.spinFor(directionType::fwd, rotationDegrees, degrees); 
+    ClawMotor.setBrake(brakeType::hold);
   }
+  else if (clawState == closed){
+      Controller1.rumble("..");
+    }
+  clawState = closed;
 }
 
 
 void Claw::changeState(){
   switch(clawState){
       case opened:
-        clamp();
-        clawState = closed;
+        clamp(360);
+        
         break;
 
       case closed:
-        unclamp();
-        clawState = opened;
+        unclamp(360);
+        
         break;
     }
+}
+
+CLAWSTATE Claw::getMode(){
+  return clawState;
 }
